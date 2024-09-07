@@ -1,5 +1,7 @@
+from itertools import count
 import monkdata as m
 import dtree as d
+import drawtree_qt4 as qt4
 
 # Assignment 1
 # Calculate the entropy of the training datasets
@@ -37,13 +39,31 @@ print("MONK-3", sorted([(f"{d.averageGain(m.monk3, a):.4g}", a) for a in m.attri
 print()
 
 # Assignment 5
-monk_1Sk_5 = d.select(m.monk1, m.attributes[4], 4)   
-monk_1Sk_5_1 = d.averageGain(monk_1Sk_5, m.attributes[0])
-monk_1Sk_5_2 = d.averageGain(monk_1Sk_5, m.attributes[1])
-monk_1Sk_5_3 = d.averageGain(monk_1Sk_5, m.attributes[2])
-monk_1Sk_5_4 = d.averageGain(monk_1Sk_5, m.attributes[3])
-monk_1Sk_5_6 = d.averageGain(monk_1Sk_5, m.attributes[5])
 
-# sort and print the results
-print("MONK-1", sorted([(f"{d.averageGain(monk_1Sk_5, a):.4g}", a) for a in m.attributes], reverse=True))
+# level 1: strat splittingt the MONK-1 dataset with A5
+monk1_5_1 = d.select(m.monk1, m.attributes[4], 1)
+monk1_5_2 = d.select(m.monk1, m.attributes[4], 2)
+monk1_5_3 = d.select(m.monk1, m.attributes[4], 3)
+monk1_5_4 = d.select(m.monk1, m.attributes[4], 4)
+
+# calculate the entropy of the subsets of level 1
+print("Entropy of MONK-1 A5=1:", d.entropy(monk1_5_1))
+print("Entropy of MONK-1 A5=2:", d.entropy(monk1_5_2))
+print("Entropy of MONK-1 A5=3:", d.entropy(monk1_5_3))
+print("Entropy of MONK-1 A5=4:", d.entropy(monk1_5_4))
+print()
+
+# level 2: strat splitting the MONK-1>>a5 nodes. The first node (a5=1) is now a leaf node and we will only split the other nodes
+# choose the attribute with the highest information gain for the node where a5=2
+print("MONK-1 A5=2", sorted([(f"{d.averageGain(monk1_5_2, a):.4g}", a) for a in m.attributes], reverse=True))
+# choose the attribute with the highest information gain for the node where a5=3
+print("MONK-1 A5=3", sorted([(f"{d.averageGain(monk1_5_3, a):.4g}", a) for a in m.attributes], reverse=True))
+# choose the attribute with the highest information gain for the node where a5=4
+print("MONK-1 A5=4", sorted([(f"{d.averageGain(monk1_5_4, a):.4g}", a) for a in m.attributes], reverse=True))
+print()
+
+tree = d.buildTree(m.monk1, m.attributes)
+print(tree)
+qt4.drawTree(tree)
+
 
