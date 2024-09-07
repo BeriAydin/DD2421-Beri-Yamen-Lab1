@@ -1,7 +1,7 @@
 from itertools import count
 import monkdata as m
 import dtree as d
-import drawtree_qt4 as qt4
+import drawtree_qt5 as pyqt
 
 # Assignment 1
 # Calculate the entropy of the training datasets
@@ -62,8 +62,28 @@ print("MONK-1 A5=3", sorted([(f"{d.averageGain(monk1_5_3, a):.4g}", a) for a in 
 print("MONK-1 A5=4", sorted([(f"{d.averageGain(monk1_5_4, a):.4g}", a) for a in m.attributes], reverse=True))
 print()
 
-tree = d.buildTree(m.monk1, m.attributes)
-print(tree)
-qt4.drawTree(tree)
+tree1 = d.buildTree(m.monk1, m.attributes)
+tree2 = d.buildTree(m.monk2, m.attributes)
+tree3 = d.buildTree(m.monk3, m.attributes)
+
+err1_train = 1-d.check(tree1,m.monk1)
+err1_test = 1-d.check(tree1,m.monk1test)
+err2_train = 1-d.check(tree2,m.monk1)
+err2_test = 1-d.check(tree2,m.monk1test)
+err3_train = 1-d.check(tree3,m.monk1)
+err3_test = 1-d.check(tree3,m.monk1test)
+
+print("Error rate for MONK-1 training set:", err1_train)
+print("Error rate for MONK-1 test set:", err1_test)
+print("Error rate for MONK-2 training set:", err2_train)
+print("Error rate for MONK-2 test set:", err2_test)
+print("Error rate for MONK-3 training set:", err3_train)
+print("Error rate for MONK-3 test set:", err3_test)
+print()
+
+#print(tree1)
+#pyqt.drawTree(tree1)
+
+
 
 

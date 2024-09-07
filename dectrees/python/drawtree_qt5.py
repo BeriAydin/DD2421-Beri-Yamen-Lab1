@@ -37,6 +37,8 @@ class MyPainting(QWidget):
 
 
 def draw(p, t, x, y):
+    x = int(x)
+    y = int(y)
     if isinstance(t, dtree.TreeLeaf):
         p.drawText(x-3, y+15, 'T' if t.cvalue else 'F')
         return x, x+20
@@ -44,9 +46,11 @@ def draw(p, t, x, y):
     anchors = []
     for b in t.branches:
         mid, xx = draw(p, t.branches[b], xx, y+70)
+        mid = int(mid)
         p.drawText(mid-3, y+68, str(b))
         anchors.append(mid)
     newMid = (x+xx)/2
+    newMid = int(newMid)
     p.drawText(newMid-7, y+15, t.attribute.name)
     p.drawEllipse(newMid-15, y, 30, 20)
     for m in anchors:
