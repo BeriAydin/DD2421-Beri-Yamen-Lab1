@@ -1,3 +1,4 @@
+import random
 from itertools import count
 import monkdata as m
 import dtree as d
@@ -62,16 +63,16 @@ print("MONK-1 A5=3", sorted([(f"{d.averageGain(monk1_5_3, a):.4g}", a) for a in 
 print("MONK-1 A5=4", sorted([(f"{d.averageGain(monk1_5_4, a):.4g}", a) for a in m.attributes], reverse=True))
 print()
 
-tree1 = d.buildTree(m.monk1, m.attributes)
-tree2 = d.buildTree(m.monk2, m.attributes)
-tree3 = d.buildTree(m.monk3, m.attributes)
+monk1tree = d.buildTree(m.monk1, m.attributes)
+monk2tree = d.buildTree(m.monk2, m.attributes)
+monk3tree = d.buildTree(m.monk3, m.attributes)
 
-err1_train = 1-d.check(tree1,m.monk1)
-err1_test = 1-d.check(tree1,m.monk1test)
-err2_train = 1-d.check(tree2,m.monk1)
-err2_test = 1-d.check(tree2,m.monk1test)
-err3_train = 1-d.check(tree3,m.monk1)
-err3_test = 1-d.check(tree3,m.monk1test)
+err1_train = 1-d.check(monk1tree,m.monk1)
+err1_test = 1-d.check(monk1tree,m.monk1test)
+err2_train = 1-d.check(monk2tree,m.monk1)
+err2_test = 1-d.check(monk2tree,m.monk1test)
+err3_train = 1-d.check(monk3tree,m.monk1)
+err3_test = 1-d.check(monk3tree,m.monk1test)
 
 print("Error rate for MONK-1 training set:", err1_train)
 print("Error rate for MONK-1 test set:", err1_test)
@@ -81,8 +82,53 @@ print("Error rate for MONK-3 training set:", err3_train)
 print("Error rate for MONK-3 test set:", err3_test)
 print()
 
-#print(tree1)
-#pyqt.drawTree(tree1)
+#print(monk1tree)
+#pyqt.drawTree(monk1tree)
+
+# Assignment 6
+# Split the MONK-1 dataset into a training set and a validation set
+
+
+def partition(data, fraction):
+    ldata = list(data)
+    random.shuffle(ldata)
+    breakPoint = int(len(ldata) * fraction)
+    return ldata[:breakPoint], ldata[breakPoint:]
+
+def pruneTree(tree_data, fraction):
+    "prunes the tree and returns the pruned tree"
+    training_data, validation_data = partition(tree_data, fraction)
+    temp_tree = d.buildTree(training_data, m.attributes)
+    candidates = d.allPruned(temp_tree)
+    
+    print("length of candidate list: ",len(candidates))
+    # print the error rate for each candidate and the candidate itself using enumerate
+    current_max = 0
+    for i, candidate in enumerate(candidates):
+        temp_rate = d.check(candidate, validation_data)
+        #print(f"Correct rate for candidate {i+1}: {temp_rate}")   #log
+        if temp_rate >= current_max:
+            current_max = temp_rate
+            current_max_candidate = candidate
+    print("The pruned tree is: ", current_max_candidate, "with error rate: ", current_max, "and fraction: ", fraction)
+
+    return current_max_candidate
+
+the_pruned_tree = pruneTree(m.monk3, 0.6)
+print()
+#pyqt.drawTree(the_pruned_tree)
+
+
+
+# Assignment 7
+fractions = [0.3, 0.4, 0.5, 0.6, 0.7, 0.8]
+
+for fraction in fractions:
+    pruneTree(m.monk1, fraction)
+    print()
+    
+
+
 
 
 
