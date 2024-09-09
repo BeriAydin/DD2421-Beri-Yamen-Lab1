@@ -3,6 +3,10 @@ from itertools import count
 import monkdata as m
 import dtree as d
 import drawtree_qt5 as pyqt
+import numpy as np
+import matplotlib.pyplot as plt
+
+
 
 # Assignment 1
 # Calculate the entropy of the training datasets
@@ -67,12 +71,12 @@ monk1tree = d.buildTree(m.monk1, m.attributes)
 monk2tree = d.buildTree(m.monk2, m.attributes)
 monk3tree = d.buildTree(m.monk3, m.attributes)
 
-err1_train = 1-d.check(monk1tree,m.monk1)
-err1_test = 1-d.check(monk1tree,m.monk1test)
-err2_train = 1-d.check(monk2tree,m.monk1)
-err2_test = 1-d.check(monk2tree,m.monk1test)
-err3_train = 1-d.check(monk3tree,m.monk1)
-err3_test = 1-d.check(monk3tree,m.monk1test)
+err1_train = 1-d.check(monk1tree, m.monk1)
+err1_test = 1-d.check(monk1tree, m.monk1test)
+err2_train = 1-d.check(monk2tree, m.monk2)
+err2_test = 1-d.check(monk2tree, m.monk2test)
+err3_train = 1-d.check(monk3tree, m.monk3)
+err3_test = 1-d.check(monk3tree, m.monk3test)
 
 print("Error rate for MONK-1 training set:", err1_train)
 print("Error rate for MONK-1 test set:", err1_test)
@@ -110,22 +114,68 @@ def pruneTree(tree_data, fraction):
         if temp_rate >= current_max:
             current_max = temp_rate
             current_max_candidate = candidate
-    print("The pruned tree is: ", current_max_candidate, "with error rate: ", current_max, "and fraction: ", fraction)
+    #print("The pruned tree is: ", current_max_candidate, "with error rate: ", current_max, "and fraction: ", fraction)  #log
 
-    return current_max_candidate
+    return current_max
 
-the_pruned_tree = pruneTree(m.monk3, 0.6)
+pruneTree(m.monk3, 0.6)
 print()
 #pyqt.drawTree(the_pruned_tree)
 
 
 
 # Assignment 7
-fractions = [0.3, 0.4, 0.5, 0.6, 0.7, 0.8]
 
+
+N = 100
+error_arr_monk1 = np.zeros((N, 8))
+error_arr_monk3 = np.zeros((N, 8))
+
+fractions = [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.99]
 for fraction in fractions:
-    pruneTree(m.monk1, fraction)
+    for i in range(N):
+        error_arr_monk1[i, fractions.index(fraction)] = pruneTree(m.monk1, fraction)
+        error_arr_monk3[i, fractions.index(fraction)] = pruneTree(m.monk3, fraction)
+
+# Calculate the mean and standard deviation of the error rate for each fraction for both datasets
+mean_monk1 = np.mean(error_arr_monk1, axis=0)
+std_monk1 = np.std(error_arr_monk1, axis=0)
+mean_monk3 = np.mean(error_arr_monk3, axis=0)
+std_monk3 = np.std(error_arr_monk3, axis=0)
+
+# Print the results in a table for each fraction
+for i in range(len(fractions)):
+    print(f"Fraction: {fractions[i]} MONK-1 Mean: {mean_monk1[i]} Standard deviation: {std_monk1[i]}")
+    print(f"Fraction: {fractions[i]} MONK-3 Mean: {mean_monk3[i]} Standard deviation: {std_monk3[i]}")
     print()
+
+# Plotting
+plt.figure(figsize=(10, 8))
+
+# Plotting MONK-1 dataset
+plt.errorbar(fractions, mean_monk1, yerr=std_monk1, fmt='o-', color='blue', label='MONK-1')
+
+# Plotting MONK-3 dataset
+plt.errorbar(fractions, mean_monk3, yerr=std_monk3, fmt='o-', color='red', label='MONK-3')
+
+# Labeling the axes
+plt.xlabel('Fraction')
+plt.ylabel('Mean Error')
+plt.title('Error vs. Fraction for MONK-1 and MONK-3 Datasets')
+
+# Adding legend to differentiate between different datasets
+plt.legend(title="Datasets")
+
+# Show the plot
+plt.grid(True)
+plt.show()
+
+
+
+
+
+
+        
     
 
 
